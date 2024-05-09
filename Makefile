@@ -35,13 +35,14 @@ $(Status)/done: $(Status)/dist
 $(Status)/dist: $(Status)/wix
 	mkdir -p $(DistDir)
 	cp $(shell cygpath -aw $(WixDir)/sshfs-win-$(MyVersion)-$(MyArch).msi) $(DistDir)
-	tools/signtool sign \
-		/ac tools/$(CrossCert) \
-		/i $(CertIssuer) \
-		/n $(MyCompanyName) \
-		/d $(MyDescription) \
-		/fd sha1 \
-		/t http://timestamp.digicert.com \
+	signtool sign \
+		/f '$(shell cygpath -aw /cygdrive/d/Development/Signing/ra-micro2022.pfx)' \
+		/p 'replaceme' \
+		/fd sha256 \
+		/tr http://timestamp.digicert.com/sha256/timestamp \
+		/td sha256 \
+		/d RA-MICRO \
+		/du www.ra-micro.de \
 		'$(shell cygpath -aw $(DistDir)/sshfs-win-$(MyVersion)-$(MyArch).msi)' || \
 		echo "SIGNING FAILED! The product has been successfully built, but not signed." 1>&2
 	touch $(Status)/dist
